@@ -2,6 +2,9 @@
 
 A production-grade, end-to-end DevOps portfolio project demonstrating microservices architecture, GitOps, Infrastructure as Code, security, and full observability — all in a single cohesive system.
 
+
+https://github.com/user-attachments/assets/b07ad7c9-06be-4962-9b99-7ed3b31ca0d6
+
 <img width="1408" height="768" alt="Devops" src="https://github.com/user-attachments/assets/f264b7c5-dd3e-43b8-b6e5-1e1206c028be" />
 
 ---
