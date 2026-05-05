@@ -61,5 +61,13 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - product-service
+      - order-service
+
 volumes:
   postgres_data:
