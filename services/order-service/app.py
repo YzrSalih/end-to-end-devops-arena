@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from flask import Flask, jsonify, request
 
 import broker
+import tracing
 
 logging.basicConfig(
     level=logging.INFO,
@@ -18,6 +19,7 @@ QUEUE_NAME = os.environ.get("QUEUE_NAME", "order_events")
 
 def create_app():
     app = Flask(__name__)
+    tracing.init_tracing(app)
 
     @app.get("/health")
     def health():

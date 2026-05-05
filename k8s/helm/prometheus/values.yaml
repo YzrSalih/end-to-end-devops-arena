@@ -1,0 +1,99 @@
+# kube-prometheus-stack: Prometheus + Grafana + Alertmanager + node-exporter
+# Tek chart ile tüm metrics stack kurulur.
+
+fullnameOverride: prometheus
+
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+
+    # Tüm namespace'lerdeki ServiceMonitor'ları topla
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+
+    # Loki log datasource'u için ek scrape config
+    additionalScrapeConfigs:
+      - job_name: devops-arena-services
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: [devops-arena]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: "true"
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+
+grafana:
+  enabled: true
+  adminPassword: "admin"   # prod'da secret olarak inject edilmeli
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  persistence:
+    enabled: true
+    size: 5Gi
+
+  # Loki datasource otomatik tanımla
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://loki.monitoring.svc.cluster.local:3100
+      access: proxy
+      isDefault: false
+
+    - name: Jaeger
+      type: jaeger
+      url: http://jaeger-query.monitoring.svc.cluster.local:16686
+      access: proxy
+      isDefault: false
+
+  # Dashboard'ları ConfigMap'ten otomatik yükle
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: monitoring
+
+  grafana.ini:
+    server:
+      root_url: "%(protocol)s://%(domain)s/grafana"
+      serve_from_sub_path: true
+
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
