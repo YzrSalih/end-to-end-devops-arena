@@ -5,6 +5,8 @@ import time
 
 import pika
 
+import tracing
+
 logging.basicConfig(
     level=logging.INFO,
     format='{"time":"%(asctime)s","level":"%(levelname)s","message":"%(message)s"}',
@@ -54,6 +56,7 @@ def on_message(channel, method, properties, body):
 
 
 def main():
+    tracing.init_tracing()
     logger.info("notification-service starting queue=%s", QUEUE_NAME)
 
     connection = get_connection()

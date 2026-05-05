@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboard-business-metrics
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  business-metrics.json: |
+    {
+      "title": "DevOps Arena — Business Metrics",
+      "uid": "business-metrics",
+      "refresh": "30s",
+      "time": { "from": "now-1h", "to": "now" },
+      "panels": [
+        {
+          "id": 1,
+          "title": "Orders per Minute",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "targets": [
+            {
+              "expr": "rate(http_requests_total{service='order-service', path='/orders', method='POST', status=~'2..'}[1m]) * 60",
+              "legendFormat": "Successful Orders/min"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Order Error Rate (%)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "targets": [
+            {
+              "expr": "rate(http_requests_total{service='order-service', status=~'5..'}[5m]) / rate(http_requests_total{service='order-service'}[5m]) * 100",
+              "legendFormat": "Error Rate %"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "RabbitMQ Queue Depth (order_events)",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+          "targets": [
+            {
+              "expr": "rabbitmq_queue_messages{queue='order_events'}",
+              "legendFormat": "Queued Messages"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "Notifications Processed/min",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+          "targets": [
+            {
+              "expr": "rate(rabbitmq_queue_messages_delivered_total{queue='order_events'}[1m]) * 60",
+              "legendFormat": "Notifications/min"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Product API — Request Latency (p99)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{service='product-service'}[5m]))",
+              "legendFormat": "p99 latency"
+            },
+            {
+              "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{service='product-service'}[5m]))",
+              "legendFormat": "p50 latency"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "title": "Active Products in DB",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
+          "targets": [
+            {
+              "expr": "product_service_total_products",
+              "legendFormat": "Total Products"
+            }
+          ]
+        }
+      ]
+    }

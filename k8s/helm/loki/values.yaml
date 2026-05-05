@@ -1,0 +1,64 @@
+# Loki Stack: Loki (log store) + Promtail (log collector)
+# ELK'ya göre çok daha az kaynak tüketir, Grafana ile native entegre.
+
+loki:
+  enabled: true
+  isDefault: false
+
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+    storage:
+      type: filesystem
+    schemaConfig:
+      configs:
+        - from: "2024-01-01"
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h
+
+  singleBinary:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    persistence:
+      enabled: true
+      size: 10Gi
+
+promtail:
+  enabled: true
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+  config:
+    clients:
+      - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+
+    snippets:
+      pipelineStages:
+        # JSON log formatını parse et (tüm servislerimiz JSON log yazıyor)
+        - json:
+            expressions:
+              level: level
+              message: message
+              time: time
+        - labels:
+            level:
+        - timestamp:
+            source: time
+            format: RFC3339Nano
