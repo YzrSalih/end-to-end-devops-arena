@@ -1,0 +1,7 @@
+# Istio sidecar injection'ı bu namespace'de otomatik aktif eder.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devops-arena
+  labels:
+    istio-injection: enabled

@@ -1,0 +1,17 @@
+# Dış trafiği cluster'a alan tek giriş noktası.
+# Nginx ingress yerine Istio Gateway kullanıyoruz.
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: devops-arena-gateway
+  namespace: devops-arena
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"

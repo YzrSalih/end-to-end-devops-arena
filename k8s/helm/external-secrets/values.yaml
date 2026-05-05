@@ -1,0 +1,22 @@
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+serviceAccount:
+  create: true
+  name: external-secrets
+  # IRSA annotation — Terraform'dan gelen role ARN buraya gelir
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT_ID:role/devops-arena-dev-external-secrets-role
+
+webhook:
+  replicaCount: 1
+
+certController:
+  replicaCount: 1

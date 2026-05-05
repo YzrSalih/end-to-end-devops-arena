@@ -1,0 +1,69 @@
+# Vault initialize ve secret seed job'u.
+# Cluster ilk kurulduğunda bir kez çalışır.
+# Prod'da bu job yerine Vault operator veya external init script kullanılmalı.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vault-init
+  namespace: vault
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: vault
+      containers:
+        - name: vault-init
+          image: hashicorp/vault:1.17
+          env:
+            - name: VAULT_ADDR
+              value: "http://vault.vault.svc.cluster.local:8200"
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: vault-root-token
+                  key: token
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+
+              # KV secrets engine'i etkinleştir
+              vault secrets enable -path=secret kv-v2 2>/dev/null || echo "already enabled"
+
+              # Product service secrets
+              vault kv put secret/devops-arena/product-service \
+                DATABASE_URL="postgresql://devops:CHANGE_ME@rds-endpoint:5432/products?sslmode=require"
+
+              # Order service secrets
+              vault kv put secret/devops-arena/order-service \
+                RABBITMQ_URL="amqp://devops:CHANGE_ME@rabbitmq.devops-arena.svc.cluster.local:5672/"
+
+              # Notification service secrets
+              vault kv put secret/devops-arena/notification-service \
+                RABBITMQ_URL="amqp://devops:CHANGE_ME@rabbitmq.devops-arena.svc.cluster.local:5672/"
+
+              # ESO için policy oluştur
+              vault policy write eso-reader - <<EOF
+              path "secret/data/devops-arena/*" {
+                capabilities = ["read"]
+              }
+              EOF
+
+              # Kubernetes auth method'u etkinleştir
+              vault auth enable kubernetes 2>/dev/null || echo "already enabled"
+
+              vault write auth/kubernetes/config \
+                kubernetes_host="https://kubernetes.default.svc"
+
+              # ESO service account için role
+              vault write auth/kubernetes/role/eso-role \
+                bound_service_account_names=external-secrets \
+                bound_service_account_namespaces=external-secrets \
+                policies=eso-reader \
+                ttl=1h
+
+              echo "Vault init completed successfully"

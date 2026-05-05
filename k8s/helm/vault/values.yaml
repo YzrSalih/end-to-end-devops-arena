@@ -1,0 +1,59 @@
+global:
+  enabled: true
+
+injector:
+  enabled: false          # ESO kullanıyoruz, agent sidecar injector'a gerek yok
+
+server:
+  replicas: 1             # dev: 1, prod: 3 (HA + Raft)
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  affinity: ""
+
+  # Dev modda otomatik unseal — prod'da AWS KMS ile değiştirilmeli
+  dev:
+    enabled: false
+
+  standalone:
+    enabled: true
+    config: |
+      ui = true
+
+      listener "tcp" {
+        tls_disable = 1
+        address     = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+
+      storage "file" {
+        path = "/vault/data"
+      }
+
+  dataStorage:
+    enabled: true
+    size: 5Gi
+    storageClass: null
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 8200
+
+  ui:
+    enabled: true
+    serviceType: ClusterIP
+
+  # Vault başladıktan sonra secret path'lerini ve policy'leri oluşturur
+  postStart:
+    - /bin/sh
+    - -c
+    - |
+      sleep 5
+      vault login token=root 2>/dev/null || true

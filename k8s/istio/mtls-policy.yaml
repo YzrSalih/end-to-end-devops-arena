@@ -1,0 +1,23 @@
+# devops-arena namespace'indeki tüm servisler arası trafiği
+# mTLS ile şifreler. STRICT mod: düz HTTP kesinlikle reddedilir.
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: devops-arena
+spec:
+  mtls:
+    mode: STRICT
+---
+# DestinationRule: Istio'ya bu namespace'deki servislere
+# bağlanırken mTLS kullanmasını söyler.
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: default
+  namespace: devops-arena
+spec:
+  host: "*.devops-arena.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
