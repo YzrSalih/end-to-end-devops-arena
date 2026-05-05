@@ -1,0 +1,27 @@
+# App of Apps pattern — ArgoCD'ye tek bir kaynak göster,
+# o da diğer tüm Application'ları otomatik oluşturur.
+#
+# İlk kurulumda sadece bu dosyayı apply et:
+#   kubectl apply -f k8s/argocd/applications/app-of-apps.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: devops-arena
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YzrSalih/end-to-end-devops-arena
+    targetRevision: main
+    path: k8s/argocd/applications
+    directory:
+      exclude: app-of-apps.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
