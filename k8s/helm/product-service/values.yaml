@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: salihyazar/product-service
+  repository: yzrsalih/product-service
   pullPolicy: IfNotPresent
   tag: "latest"
 

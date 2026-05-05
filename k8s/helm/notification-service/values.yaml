@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: salihyazar/notification-service
+  repository: yzrsalih/notification-service
   pullPolicy: IfNotPresent
   tag: "latest"
 

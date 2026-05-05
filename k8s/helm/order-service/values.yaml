@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: salihyazar/order-service
+  repository: yzrsalih/order-service
   pullPolicy: IfNotPresent
   tag: "latest"
 
