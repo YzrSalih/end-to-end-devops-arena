@@ -10,7 +10,9 @@
       "Bash(curl -s http://localhost:5001/health)",
       "Bash(curl -s -X POST http://localhost:8080/products -H 'Content-Type: application/json' -d '{\"name\":\"Laptop\",\"price\":1299.99,\"stock\":50}')",
       "Bash(curl -s http://localhost:8080/products)",
-      "Bash(curl -s -X POST http://localhost:5001/orders -H 'Content-Type: application/json' -d '{\"product_id\":1,\"quantity\":2,\"customer_email\":\"test@example.com\"}')"
+      "Bash(curl -s -X POST http://localhost:5001/orders -H 'Content-Type: application/json' -d '{\"product_id\":1,\"quantity\":2,\"customer_email\":\"test@example.com\"}')",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
