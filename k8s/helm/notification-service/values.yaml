@@ -1,0 +1,21 @@
+replicaCount: 1
+
+image:
+  repository: yzrsalih/notification-service
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+# Worker has no HTTP port — no Service or health check endpoint needed
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+env:
+  QUEUE_NAME: "order_events"
+
+# RABBITMQ_URL injected from Secret
+secretName: notification-service-secrets
