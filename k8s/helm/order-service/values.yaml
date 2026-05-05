@@ -3,7 +3,7 @@ replicaCount: 2
 image:
   repository: yzrsalih/order-service
   pullPolicy: IfNotPresent
-  tag: "latest"
+  tag: "sha-f648213"
 
 service:
   type: ClusterIP
