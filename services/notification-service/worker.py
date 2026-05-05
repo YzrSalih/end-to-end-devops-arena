@@ -4,7 +4,6 @@ import os
 import time
 
 import pika
-from opentelemetry import trace
 
 import tracing
 
@@ -57,7 +56,7 @@ def on_message(channel, method, properties, body):
 
 
 def main():
-    tracer = tracing.init_tracing()
+    tracing.init_tracing()
     logger.info("notification-service starting queue=%s", QUEUE_NAME)
 
     connection = get_connection()
