@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: yzrsalih/notification-service
   pullPolicy: IfNotPresent
-  tag: "latest"
+  tag: "sha-1bd91af"
 
 # Worker has no HTTP port — no Service or health check endpoint needed
 resources:
