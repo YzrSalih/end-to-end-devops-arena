@@ -1,5 +1,9 @@
 # CLAUDE.md — Project Context for AI Assistants
-## Test from Abdullah
+<<<<<<< Updated upstream
+## Test from Abdullah three
+=======
+## Test from Abdullah 2
+>>>>>>> Stashed changes
 ## Project Overview
 
 **Name:** Cloud-Native Event-Driven Market  
